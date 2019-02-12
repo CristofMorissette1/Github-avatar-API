@@ -1,5 +1,5 @@
 var request = require('request');
-var secret = require('./secret.js');
+var secret = require('./secret.js')
 console.log('Welcome to Avatar API');
 
 request.get('https://api.github.com/repos/jquery/jquery/contributors');
@@ -13,8 +13,8 @@ function getRepoContributors(repoOwner, repoName, cb) {
         }
       };
     
-    request(url, function(err, res, body) {
-      cb(err, body);
+    request(options, function(err, res, body) {
+        cb(err, JSON.parse(body));
     });
   }
   
