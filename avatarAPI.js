@@ -1,37 +1,41 @@
 var request = require('request');
-var secret = require('./secret.js')
+var secrets = require('./secret');
 var fs = require('fs');
-console.log('Welcome to Avatar API');
+var repoOwner = process.argv[2];
+var repoName = process.argv[3];
 
-request.get('https://api.github.com/repos/jquery/jquery/contributors');
+console.log('Welcome to the GitHub Avatar Downloader!');
+
+request.get('https://api.github.com/repos/jquery/jquery/contributors')
+
 
 
 function getRepoContributors(repoOwner, repoName, cb) {
     var options = {
-        url: "https://api.github.com/repos/" + repoOwner + "/" + repoName + "/contributors",
-        headers: {
-          'User-Agent': 'request'
-        }
-      };
     
+    url: "https://api.github.com/repos/" + repoOwner + "/" + repoName + "/contributors",
+    headers: {
+        'User-Agent': secrets
+    }
+ };
     request(options, function(err, res, body) {
-        cb(err, JSON.parse(body));
+        cb(err, body);
     });
   }
-  
-   function downloadImageByURL(url, filePath) {
 
-     request.get(url)
-     .pipe(fs.createWriteStream(filePath));
- }
- downloadImageByURL('https://avatars2.githubusercontent.com/u/2741?v=3&s=466', "./test.png");
+  function downloadImageByURL(url, filePath) {
+    // ...request url and write to file path
+    request.get(url)
+    .pipe(fs.createWriteStream(filePath));
+  }
 
-getRepoContributors("jquery", "jquery", function(err, result) {
-    result.forEach( function(element) {
-      console.log(element);
-    })
-     console.log("Errors:", err);
-     console.log("Result:", result);
+  getRepoContributors("jquery", "jquery", function(err, result) {
+    var obj = JSON.parse(result);
+    obj.forEach(element => {
+        // console.log(element.login, element.avatar_url);
+        downloadImageByURL(element.avatar_url, `avatars/${element.login}.jpeg`); 
+    });
+    // console.log("Errors:", err);
+    // console.log("Result:", result);
+    
   });
-
- 
